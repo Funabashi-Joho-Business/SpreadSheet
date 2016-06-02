@@ -80,4 +80,10 @@ public abstract class SQLite extends SQLiteOpenHelper
 		}
 		return null;
 	}
+	//SQLインジェクション対策
+	public static String STR(String str)
+	{
+		//シングルクオートをシングルクオート二つにエスケーブ
+		return str.replaceAll("'", "''");
+	}
 }
