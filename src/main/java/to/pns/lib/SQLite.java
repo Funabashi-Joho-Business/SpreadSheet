@@ -12,9 +12,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 public abstract class SQLite extends SQLiteOpenHelper
 {
 	private SQLiteDatabase mDataBase;
-	public SQLite(Context context,String dbName)
+	public SQLite(Context context,String dbName,int version)
 	{
-		super(context, dbName, null, 2);
+		super(context, dbName, null, version);
 	}
 	@Override
 	public synchronized void close() {
@@ -85,5 +85,13 @@ public abstract class SQLite extends SQLiteOpenHelper
 	{
 		//シングルクオートをシングルクオート二つにエスケーブ
 		return str.replaceAll("'", "''");
+	}
+	public void begin()
+	{
+		exec("begin;");
+	}
+	public void commit()
+	{
+		exec("commit;");
 	}
 }
