@@ -25,7 +25,7 @@ public abstract class SQLite extends SQLiteOpenHelper
 	public void insert(String tableName, ContentValues v){
 		mDataBase.insert(tableName,null,v);
 	}
-	boolean isTable(String name)
+	public boolean isTable(String name)
 	{
 		String sql = String.format("select name from sqlite_master where name='%s';",name);
 		Cursor c = query(sql);
