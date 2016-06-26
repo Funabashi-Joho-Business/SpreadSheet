@@ -144,7 +144,7 @@ public class GraphView extends View {
 		p.setTextSize((int)(8.0f*mDensity+0.5f));
 		
 	
-		if(subMin != Integer.MAX_VALUE)
+		if(subMin != Integer.MAX_VALUE && subMin != 0)
 		{
 		
 			graphHeight -= p.getTextSize()*2;
