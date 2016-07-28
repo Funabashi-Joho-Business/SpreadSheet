@@ -12,9 +12,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 public abstract class SQLite extends SQLiteOpenHelper
 {
 	private SQLiteDatabase mDataBase;
-	public SQLite(Context context,String dbName)
+	public SQLite(Context context,String dbName,int version)
 	{
-		super(context, dbName, null, 2);
+		super(context, dbName, null, version);
 	}
 	@Override
 	public synchronized void close() {
@@ -25,7 +25,7 @@ public abstract class SQLite extends SQLiteOpenHelper
 	public void insert(String tableName, ContentValues v){
 		mDataBase.insert(tableName,null,v);
 	}
-	boolean isTable(String name)
+	public boolean isTable(String name)
 	{
 		String sql = String.format("select name from sqlite_master where name='%s';",name);
 		Cursor c = query(sql);
@@ -85,5 +85,13 @@ public abstract class SQLite extends SQLiteOpenHelper
 	{
 		//シングルクオートをシングルクオート二つにエスケーブ
 		return str.replaceAll("'", "''");
+	}
+	public void begin()
+	{
+		exec("begin;");
+	}
+	public void commit()
+	{
+		exec("commit;");
 	}
 }

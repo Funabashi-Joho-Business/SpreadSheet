@@ -23,7 +23,7 @@ public class LogDB extends SQLite
 	
 	public LogDB(Context context)
 	{
-		super(context,"log.db");
+		super(context,"log.db",3);
 	}
 
 	@Override

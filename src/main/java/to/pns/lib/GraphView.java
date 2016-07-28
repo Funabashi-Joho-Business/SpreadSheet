@@ -21,9 +21,17 @@ class UnitParam
 		//幅の桁数
 		int log = (int)Math.ceil(Math.log10(bound))-1;
 		mUnit = (int) Math.pow(10,log);
-		
-		mMin = min / mUnit * mUnit;
-		mMax = (max+mUnit-1) / mUnit * mUnit;		
+
+		if(mUnit != 0){
+			mMin = min / mUnit * mUnit;
+			mMax = (max+mUnit-1) / mUnit * mUnit;
+		}
+		else{
+			mMin = 0;
+			mMax = 1;
+		}
+
+
 	}
 	public long getMin() {
 		return mMin;
@@ -36,6 +44,8 @@ class UnitParam
 	}
 	public long getCount()
 	{
+		if(mUnit == 0)
+			return 0;
 		return (mMax - mMin) / mUnit;
 	}
 	private long mMin;
@@ -144,7 +154,7 @@ public class GraphView extends View {
 		p.setTextSize((int)(8.0f*mDensity+0.5f));
 		
 	
-		if(subMin != Integer.MAX_VALUE)
+		if(subMin != Integer.MAX_VALUE && subMin != 0)
 		{
 		
 			graphHeight -= p.getTextSize()*2;
