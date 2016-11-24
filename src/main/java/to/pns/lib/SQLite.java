@@ -86,6 +86,7 @@ public abstract class SQLite extends SQLiteOpenHelper
 		//シングルクオートをシングルクオート二つにエスケーブ
 		return str.replaceAll("'", "''");
 	}
+
 	public void begin()
 	{
 		exec("begin;");
