@@ -1,18 +1,19 @@
 package to.pns.lib;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import static com.google.api.client.http.HttpMethods.HEAD;
 
 
-
-public class LogDB extends SQLite 
+public class LogDB extends SQLite
 {
 	public class LogData
 	{
@@ -23,7 +24,8 @@ public class LogDB extends SQLite
 	
 	public LogDB(Context context)
 	{
-		super(context,"log.db",3);
+		super(context,"log.db",4);
+
 	}
 
 	@Override
