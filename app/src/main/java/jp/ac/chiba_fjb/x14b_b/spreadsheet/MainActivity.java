@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.List;
 
+import to.pns.lib.google.SpreadSheet;
+
 public class MainActivity extends AppCompatActivity {
     private SpreadSheet mSheet;
 
