@@ -10,7 +10,7 @@ android {
     }
 
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "26.0.1"
     defaultConfig {
         multiDexEnabled true
         applicationId "jp.ac.chiba_fjb.x14b_b.spreadsheet"
@@ -27,9 +27,10 @@ android {
         }
     }
 
-
+    //追加したモジュールの警告を消すための設定
     configurations.all {
         resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
+        exclude group: "org.apache.httpcomponents", module: "httpclient"
     }
 }
 
@@ -40,11 +41,14 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile('com.google.api-client:google-api-client-android:1.22.0')
-    compile('com.google.apis:google-api-services-sheets:v4-rev38-1.22.0')
-    compile 'com.google.android.gms:play-services-auth:10.+'
+    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile ('com.google.android.gms:play-services-auth:11.+')
+
+    //追加が必要なモジュール
     compile 'com.google.http-client:google-http-client-gson:1.22.0'
-    compile 'com.google.apis:google-api-services-drive:v3-rev45-1.22.0'
-    compile project(path: ':ShareLib')
+    compile('com.google.api-client:google-api-client-android:1.22.0')
+    compile('com.google.apis:google-api-services-sheets:v4-rev1-1.21.0')
+    compile ('com.google.apis:google-api-services-drive:v3-rev83-1.22.0')
+
+
 }

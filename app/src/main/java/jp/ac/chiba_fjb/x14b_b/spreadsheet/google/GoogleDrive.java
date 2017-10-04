@@ -1,4 +1,4 @@
-package to.pns.lib.google;
+package jp.ac.chiba_fjb.x14b_b.spreadsheet.google;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -117,7 +117,14 @@ public class GoogleDrive extends GoogleAccount {
         } catch (IOException e) {}
         return null;
     }
-
+    private String _getFolderId(String parent,String name){
+        try {
+            FileList list = mDrive.files().list().setQ(String.format("mimeType = 'application/vnd.google-apps.folder' and trashed=false and '%s' in parents and name='%s'", parent, name)).execute();
+            if(list.getFiles().size() > 0)
+                return list.getFiles().get(0).getId();
+        } catch (IOException e) {}
+        return null;
+    }
 
     public String getItemId(String path){
         String[] folders = path.split("/", 0);
@@ -138,7 +145,7 @@ public class GoogleDrive extends GoogleAccount {
             return id;
 
         PathFile pathFile = new PathFile(path);
-        String parentId = getItemId(pathFile.getFolder());
+        String parentId = getFolderId(null,pathFile.getFolder(),true);
         if(parentId == null)
             return null;
 
@@ -178,15 +185,16 @@ public class GoogleDrive extends GoogleAccount {
         return false;
     }
     public String getFolderId(String name){
-        return getFolderId(name,false);
+        return getFolderId(null,name,false);
     }
-    public String getFolderId(String name,boolean cflag){
+    public String getFolderId(String id,String name,boolean cflag){
         String[] folders = name.split("/", 0);
-        String id = getRootId();
+        if(id == null)
+            id = getRootId();
         for(String f : folders){
             if(f.length() == 0)
                 continue;
-            String id2 = getFolderId(id,cflag);
+            String id2 = _getFolderId(id,f);
             if(id2 == null && cflag)
                 id = createFolder(id,f);
             else
@@ -216,7 +224,7 @@ public class GoogleDrive extends GoogleAccount {
     public String upload(String dest,String src,String type){
         try {
             java.io.File fileDest = new java.io.File(dest);
-            String pid = getFolderId(fileDest.getParent(),true);
+            String pid = getFolderId(null,fileDest.getParent(),true);
 
             File fileMetadata = new File();
             fileMetadata.setName(fileDest.getName());

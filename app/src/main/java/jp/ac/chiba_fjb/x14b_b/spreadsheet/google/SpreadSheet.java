@@ -1,4 +1,4 @@
-package to.pns.lib.google;
+package jp.ac.chiba_fjb.x14b_b.spreadsheet.google;
 
 import android.content.Context;
 
