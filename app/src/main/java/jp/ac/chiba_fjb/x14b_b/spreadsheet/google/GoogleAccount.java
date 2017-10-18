@@ -1,5 +1,6 @@
 package jp.ac.chiba_fjb.x14b_b.spreadsheet.google;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
@@ -19,8 +20,8 @@ import java.util.Arrays;
  */
 
 public class GoogleAccount {
-    private static final int REQUEST_ACCOUNT_PICKER = 1234;
-    private static final int REQUEST_AUTHORIZATION = 1235;
+    private static final int REQUEST_ACCOUNT_PICKER = 998;
+    private static final int REQUEST_AUTHORIZATION = 999;
     private static final String EXTRA_NAME = "SCRIPT_INFO";
     private static final String PREF_ACCOUNT_NAME = "ScriptUser";
 
@@ -54,12 +55,12 @@ public class GoogleAccount {
         editor.putString(PREF_ACCOUNT_NAME, null);
         editor.apply();
         mAccountName = null;
-       // mCredential.setSelectedAccountName(null);
+        //mCredential.setSelectedAccountName(null);
         mCredential.setSelectedAccount(null);
     }
     public void requestAccount(){
         //ユーザ選択
-        if(mAccountName==null && mContext instanceof Activity)
+        if(mAccountName==null&& mContext instanceof Activity)
             ((Activity)mContext).startActivityForResult(mCredential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
         else
             call();
@@ -70,8 +71,9 @@ public class GoogleAccount {
                 mAccountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
 
                 if (mAccountName != null) {
+                    Account account = new Account(mAccountName,"com.google");
                     //アカウント選択確定
-                    mCredential.setSelectedAccountName(mAccountName);
+                    mCredential.setSelectedAccount(account);
                     SharedPreferences settings =
                             mContext.getSharedPreferences("GOOGLE",Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = settings.edit();

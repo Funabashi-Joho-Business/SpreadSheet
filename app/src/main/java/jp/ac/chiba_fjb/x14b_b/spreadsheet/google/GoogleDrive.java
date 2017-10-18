@@ -87,9 +87,13 @@ public class GoogleDrive extends GoogleAccount {
     }
 
     public String getRootId(){
+        //return "root";
         try {
-            if(mRootId == null)
-                mRootId = mDrive.files().get("root").setFields("id").execute().getId();
+            File f;
+            if(mRootId == null){
+                f = mDrive.files().get("root").setFields("*").execute();
+                mRootId = f.getId();}
+
         } catch (Exception e) {
             exception(e);
         }

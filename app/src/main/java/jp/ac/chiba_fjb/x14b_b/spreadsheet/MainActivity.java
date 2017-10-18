@@ -18,15 +18,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         //スプレットシートの生成
         mSheet = new SpreadSheet(this);
+        //mSheet.resetAccount();
         //許可済みか確認
-        if(!mSheet.connect())
+        if(mSheet.connect())
             start();
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
     }
+
     @SuppressWarnings("deprecation")
     public static Spanned fromHtml(String html){
         Spanned result;

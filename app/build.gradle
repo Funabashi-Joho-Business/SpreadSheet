@@ -47,7 +47,7 @@ dependencies {
     //追加が必要なモジュール
     compile 'com.google.http-client:google-http-client-gson:1.22.0'
     compile('com.google.api-client:google-api-client-android:1.22.0')
-    compile('com.google.apis:google-api-services-sheets:v4-rev1-1.21.0')
+    compile('com.google.apis:google-api-services-sheets:v4-rev1-1.22.0')
     compile ('com.google.apis:google-api-services-drive:v3-rev83-1.22.0')
 
 
