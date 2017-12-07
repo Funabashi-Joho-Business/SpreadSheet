@@ -1,2 +1,1 @@
-include ':app', ':ShareLib'
-project(':ShareLib').projectDir = new File('ShareLib')
+include ':app'
