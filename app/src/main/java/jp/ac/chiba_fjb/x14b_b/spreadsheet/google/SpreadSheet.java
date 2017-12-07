@@ -8,6 +8,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,25 +27,22 @@ public class SpreadSheet extends GoogleDrive {
 			           .setApplicationName("Google Sheets API Android Quickstart")
 			           .build();
 	}
-	public String create(String path){
-		try {
-			//フォルダ名の分解
-			String folder = "";
-			String name;
-			int pt = path.lastIndexOf("/");
-			if(pt > 0) {
-				folder = path.substring(0, pt);
-				name = path.substring(pt+1,path.length());
-			}
-			else
-				name = path;
+	public String create(String path)throws IOException {
 
-			String id = createFile(path,"application/vnd.google-apps.spreadsheet");
-			return id;
-		} catch (Exception e) {
-			exception(e);
+		//フォルダ名の分解
+		String folder = "";
+		String name;
+		int pt = path.lastIndexOf("/");
+		if(pt > 0) {
+			folder = path.substring(0, pt);
+			name = path.substring(pt+1,path.length());
 		}
-		return null;
+		else
+			name = path;
+
+		String id = createFile(path,"application/vnd.google-apps.spreadsheet");
+		return id;
+
 	}
 	public static String getRangeString(int row,int col){
 		return String.format("%c%d",'A'+col-1,row);

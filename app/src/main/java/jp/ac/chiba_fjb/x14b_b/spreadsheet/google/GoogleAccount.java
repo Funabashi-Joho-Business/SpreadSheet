@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
@@ -13,13 +14,21 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.util.ExponentialBackOff;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by oikawa on 2016/10/11.
  */
 
 public class GoogleAccount {
+
+    public interface GoogleRunnable {
+        public void run() throws IOException;
+        public void onError(Exception e);
+    }
+
     private static final int REQUEST_ACCOUNT_PICKER = 998;
     private static final int REQUEST_AUTHORIZATION = 999;
     private static final String EXTRA_NAME = "SCRIPT_INFO";
@@ -29,6 +38,7 @@ public class GoogleAccount {
     private GoogleAccountCredential mCredential;
     private String mAccountName;
     private static final String[] SCOPES = {"https://www.googleapis.com/auth/drive"};
+    List<GoogleRunnable> mRunnables = new ArrayList<>();
 
     public GoogleAccount(Context con, String[] scope) {
         //Activityの保存
@@ -85,56 +95,75 @@ public class GoogleAccount {
 
                 call();		//実行要求
             }
-            else
-
-                onError();	//実行不能時の
-            // 処理
+//            else
+//
+//                onError();	//実行不能時の
+//            // 処理
         }
         else if(requestCode == REQUEST_AUTHORIZATION) {
             if (resultCode == Activity.RESULT_OK)
                 call();			//実行要求
-            else
-                onError();	//実行不能時の処理
+//            else
+//                onError();	//実行不能時の処理
         }
     }
-    protected void exception(Exception e){
+    protected boolean exception(Exception e){
         if (e instanceof UserRecoverableAuthIOException) {
             //権限要求の呼び出し
             if(mContext instanceof Activity) {
                 Intent intent = ((UserRecoverableAuthIOException) e).getIntent();
                 ((Activity) mContext).startActivityForResult(intent, REQUEST_AUTHORIZATION);
+                return true;
             }
-
         } else if (e instanceof IllegalArgumentException) {
             //アカウント要求
             requestAccount();
+            return true;
         } else if (e instanceof GoogleJsonResponseException) {
-            onError();
+
             System.err.println(((GoogleJsonResponseException)e).getMessage());
+
 
         } else {
             //登録系エラー
-            onError();
+
             e.printStackTrace();
+
         }
+        return false;
     }
     public void call(){
+        final Handler handler = new Handler();
         new Thread() {
             @Override
             public void run() {
-                try {
-                    onExec();
+                synchronized(mRunnables){
+                    while(mRunnables.size()>0){
+                        try {
+                            mRunnables.get(0).run();
+                            mRunnables.remove(0);
+                        }catch (final Exception e) {
+                            if(exception(e)==false) {
+                                final GoogleRunnable runnable = mRunnables.get(0);
+                                mRunnables.remove(0);
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        runnable.onError(e);
+                                    }
+                                });
+                            }else
+                                break;
+                        }
+                    }
                 }
-                catch (Exception e) {
-                    exception(e);
-                }
+
+
             }
         }.start();
     }
-    protected void onExec() throws IOException {
-
-    }
-    protected void onError(){
-
+    public void execute(GoogleRunnable runnable){
+        mRunnables.add(runnable);
+        call();
     }
 }

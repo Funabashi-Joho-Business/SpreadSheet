@@ -3,11 +3,11 @@ package jp.ac.chiba_fjb.x14b_b.spreadsheet;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
-import android.text.Spanned;
 
+import java.io.IOException;
 import java.util.List;
 
+import jp.ac.chiba_fjb.x14b_b.spreadsheet.google.GoogleAccount;
 import jp.ac.chiba_fjb.x14b_b.spreadsheet.google.SpreadSheet;
 
 
@@ -22,35 +22,14 @@ public class MainActivity extends AppCompatActivity {
         //スプレットシートの生成
         mSheet = new SpreadSheet(this);
         //mSheet.resetAccount();
-        //許可済みか確認
-        if(mSheet.connect())
-            start();
-
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
-
-    @SuppressWarnings("deprecation")
-    public static Spanned fromHtml(String html){
-        Spanned result;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(html,Html.FROM_HTML_MODE_COMPACT);
-        } else {
-            result = Html.fromHtml(html);
-        }
-        return result;
-    }
-    void start(){
-        //通信用スレッド
-        new Thread(){
+        mSheet.execute(new GoogleAccount.GoogleRunnable() {
             @Override
-            public void run() {
-                super.run();
+            public void onError(Exception e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void run() throws IOException {
                 //スプレッドシートの作成
                 String id = mSheet.create("/ComData/Setting");
 
@@ -63,18 +42,18 @@ public class MainActivity extends AppCompatActivity {
                     List<List<Object>> data = mSheet.getRange(id);
                     System.out.println(data);
                 }
-
             }
-        }.start();
+        });
 
 
     }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //認証許可情報を設定
         mSheet.onActivityResult(requestCode, resultCode, data);
-        start();
     }
 
 }
