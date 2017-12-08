@@ -42,7 +42,7 @@ public class GoogleAccount {
     private static final int REQUEST_AUTHORIZATION = 999;
     private static final String EXTRA_NAME = "SCRIPT_INFO";
     private static final String PREF_ACCOUNT_NAME = "ScriptUser";
-
+    private Handler mHandler = new Handler();
     private Context mContext;
     private GoogleAccountCredential mCredential;
     private String mAccountName;
@@ -140,7 +140,7 @@ public class GoogleAccount {
         return false;
     }
     public void call(){
-        final Handler handler = new Handler();
+
         new Thread() {
             @Override
             public void run() {
@@ -153,7 +153,7 @@ public class GoogleAccount {
                             if(exception(e)==false) {
                                 final GoogleRunnable runnable = mRunnables.get(0);
                                 mRunnables.remove(0);
-                                handler.post(new Runnable() {
+                                mHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
                                         runnable.onError(e);
