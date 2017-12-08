@@ -6,14 +6,23 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.util.ExponentialBackOff;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +57,7 @@ public class GoogleAccount {
                 con, Arrays.asList(scope==null?SCOPES:scope))
                 .setBackOff(new ExponentialBackOff());
         //登録済みアカウント名を取得
-        mAccountName = mContext.getSharedPreferences("GOOGLE",Context.MODE_PRIVATE).getString(PREF_ACCOUNT_NAME, null);
+        mAccountName = mContext.getSharedPreferences("GOOGLE", Context.MODE_PRIVATE).getString(PREF_ACCOUNT_NAME, null);
         mCredential.setSelectedAccountName(mAccountName);
     }
     public GoogleAccountCredential getCredential(){
@@ -60,7 +69,7 @@ public class GoogleAccount {
     public void resetAccount(){
         //登録アカウントの解除
         SharedPreferences settings =
-                mContext.getSharedPreferences("GOOGLE",Context.MODE_PRIVATE);
+                mContext.getSharedPreferences("GOOGLE", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(PREF_ACCOUNT_NAME, null);
         editor.apply();
@@ -85,7 +94,7 @@ public class GoogleAccount {
                     //アカウント選択確定
                     mCredential.setSelectedAccount(account);
                     SharedPreferences settings =
-                            mContext.getSharedPreferences("GOOGLE",Context.MODE_PRIVATE);
+                            mContext.getSharedPreferences("GOOGLE", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putString(PREF_ACCOUNT_NAME, mAccountName);
                     editor.apply();
@@ -120,12 +129,13 @@ public class GoogleAccount {
             requestAccount();
             return true;
         } else if (e instanceof GoogleJsonResponseException) {
-
             System.err.println(((GoogleJsonResponseException)e).getMessage());
-
-
-        } else {
+        } else if(e instanceof GoogleAuthIOException){
             //登録系エラー
+            Log.e("登録エラー",getAppName(mContext)+":"+getAppFinger(mContext));
+        }
+        else{
+
 
             e.printStackTrace();
 
@@ -165,5 +175,30 @@ public class GoogleAccount {
     public void execute(GoogleRunnable runnable){
         mRunnables.add(runnable);
         call();
+    }
+    public static String getAppName(Context con){
+        try {
+            PackageInfo packageInfo = con.getPackageManager().getPackageInfo(con.getPackageName(), PackageManager.GET_SIGNATURES);
+            return packageInfo.packageName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    static public String getAppFinger(Context con){
+        try {
+            PackageInfo packageInfo = con.getPackageManager().getPackageInfo(con.getPackageName(), PackageManager.GET_SIGNATURES);
+            InputStream input = new ByteArrayInputStream(packageInfo.signatures[0].toByteArray());
+            Certificate c = CertificateFactory.getInstance("X509").generateCertificate(input);
+            byte[] publicKey = MessageDigest.getInstance("SHA1").digest(c.getEncoded());
+
+            StringBuffer hexString = new StringBuffer();
+            for (int i=0;i<publicKey.length;i++)
+                hexString.append(String.format("%02x",publicKey[i]));
+            return hexString.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
