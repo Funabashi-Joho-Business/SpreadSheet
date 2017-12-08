@@ -58,7 +58,8 @@ public class GoogleAccount {
                 .setBackOff(new ExponentialBackOff());
         //登録済みアカウント名を取得
         mAccountName = mContext.getSharedPreferences("GOOGLE", Context.MODE_PRIVATE).getString(PREF_ACCOUNT_NAME, null);
-        mCredential.setSelectedAccountName(mAccountName);
+        Account account = new Account(mAccountName,"com.google");
+        mCredential.setSelectedAccount(account);
     }
     public GoogleAccountCredential getCredential(){
         return mCredential;
@@ -74,12 +75,11 @@ public class GoogleAccount {
         editor.putString(PREF_ACCOUNT_NAME, null);
         editor.apply();
         mAccountName = null;
-        //mCredential.setSelectedAccountName(null);
         mCredential.setSelectedAccount(null);
     }
     public void requestAccount(){
         //ユーザ選択
-        if(mAccountName==null&& mContext instanceof Activity)
+        if(mCredential.getSelectedAccountName()==null)
             ((Activity)mContext).startActivityForResult(mCredential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
         else
             call();
@@ -135,10 +135,7 @@ public class GoogleAccount {
             Log.e("登録エラー",getAppName(mContext)+":"+getAppFinger(mContext));
         }
         else{
-
-
             e.printStackTrace();
-
         }
         return false;
     }
@@ -167,8 +164,6 @@ public class GoogleAccount {
                         }
                     }
                 }
-
-
             }
         }.start();
     }
