@@ -58,8 +58,11 @@ public class GoogleAccount {
                 .setBackOff(new ExponentialBackOff());
         //登録済みアカウント名を取得
         mAccountName = mContext.getSharedPreferences("GOOGLE", Context.MODE_PRIVATE).getString(PREF_ACCOUNT_NAME, null);
-        Account account = new Account(mAccountName,"com.google");
-        mCredential.setSelectedAccount(account);
+        if(mAccountName != null){
+            Account account = new Account(mAccountName,"com.google");
+            mCredential.setSelectedAccount(account);
+        }
+
     }
     public GoogleAccountCredential getCredential(){
         return mCredential;
